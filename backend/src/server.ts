@@ -15,19 +15,17 @@ if (!mongoUri) {
   console.error("Critical Error: MONGO_URI is missing from your .env file!");
   process.exit(1);
 }
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allows any localhost or 127.0.0.1 development port to pass through cleanly
-    if (!origin || /https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return; 
+  }
+  next(); 
+});
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
